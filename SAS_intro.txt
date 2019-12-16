@@ -1,0 +1,55 @@
+SAS EG is a client software configured to accessed SAS from local or remote server.
+EG has point and click wizards and tasks for SAS procedures and robust programming interface.
+
+Basic Rules-
+1. Organise files:
+.sas-program file
+.log-notes,error,warning
+.lst-output
+.sas7dat-data file
+
+2. Program:
+every command ends with ;
+format does not matter
+case insensitive
+comment:
+*....;
+/*.....*/;
+
+3. Variable:
+Types-
+->numeric(default,8digit, . stands for missing value)
+->character($,default 8 digit, blank for missing)
+Must start with letter or "_"	
+
+Suppress the column in the output that identifies each observation by number:NOOBS
+
+EXERCISE:
+In the CARS Data, Do the analysis of the following variables and plot the graph and save the project as exercise:
+Variables are:
+a. cylinders
+b. mpg_cp
+c. length
+d. make
+e. type
+f. drive_train
+
+----------------------------------------------------------------------------------------------------------------------
+
+Format converts non-std data to std data.
+	<$>format<w>.<d>
+Informat converts std data to non std data.
+
+
+Stores Date in the forms of days from Jan 1st,1960.
+	mmddyy8.	
+	weekdate.
+	monyy7.	
+	worddate.
+
+USER-DEFINED FORMAT:
+
+proc format;
+	value $ctryformat 'AU'='Australia'
+			  'US'='United States';
+format cannot have $ as first character and a _ as a second character.
