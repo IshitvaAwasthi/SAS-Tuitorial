@@ -1,0 +1,66 @@
+For ranges tiers can be made.
+proc format;
+value tiers			low-<50000='Tier 1'
+				50000-<100000='Tier 2'
+				100000-high='Tier 3';
+run;
+We can do many formats in a single program.
+ 
+---------------------------------------------------------------
+Create new data set :
+data work.subset1;
+set orion2.sales;
+where Country='AU' and Job_Title contains 'Rep';
+run;
+
+bonus=salary*.10;   (10% of salary)
+
+where DOES NOT work user defined variable.
+if is used for applying condition to user defined variable.
+
+-----------------------------------------------------
+Complilation:
+	scans the steps for syntax error
+	translates each statement into machine language 
+	creates input buffer to hold one record at atime
+	creates program data vector
+Execution:
+-----------------------------------------------------
+Delimitor:
+, | || ; 
+eg: a||34
+data work.subset;
+infile "c:\sasdata\prg2\SALES.csv" dlm=",";
+input Employee_ID First_Name $ Last_Name $ Gender $ Salary Job_Title $ Country $;
+run;
+-----------------------------------------------------
+standard numeric data:
+12304 , 2.34E
+
+Non-std numeric data:
+(23), 09/11/19
+--------------------------------------------------
+length statement:
+specifies length of each field
+	data work.subset;
+	length First_Name $ 12 Last_Name $ 18 Gender $ 1 Job_Title $ 25 Country $ 2;
+	infile "c:\sasdata\prg2\SALES.csv" dlm=",";
+	input Employee_ID First_Name $ Last_Name $ Gender $ Salary Job_Title $ Country $;
+	run;
+	proc print data=work.subset noobs;
+	run;
+--------------------------------------------------
+Data Error:
+_N_ is the Data step iteration count
+_ERROR_ indicates data error status
+	-0 indicates that no data error occured on that record
+	-1 indicates that one or more error occured on that record
+---------------------------------------------------
+How to define own data?
+data work.newemps;
+input First_Name :$12. Last_Name :$18. Job_Title :$15. Salary :dollar.;
+datalines;
+Steven Worton Auditor $40,450
+Marta-Lyn Bamber Manager $32,000
+Merle Hieds Trainee $24,025
+; 
