@@ -1,0 +1,261 @@
+SAS function:
+variable=func_name(arg1,arg2,...)
+eg: Sum, month,year,qtr,day,weekday.
+Sum ignores missing value.
+
+data functions;
+x=.;
+y=7;
+z=x+y;
+w=sum(x,y);
+run;
+
+data work.comp;
+set orion2.sales;
+Bonus=500;
+Compensation=sum(Salary,Bonus);
+BonusMonth=month(Hire_Date);
+run;
+proc print data= work.comp;
+var Employee_ID First_Name Last_Name BonusMonth Compensation Bonus;
+run;
+-----------------------------------------------------------------------IF-THEN STATEMENT:
+
+data work.comp;
+set orion2.sales;
+if Job_Title='Sales Rep. IV' then
+Bonus=1000;
+if Job_Title='Sales Manager' then
+Bonus=1500;
+if Job_Title='Senior Sales Manager' then
+Bonus=2000;
+if Job_Title='Chief Sales Officer' then
+Bonus=2500;
+run;
+
+data work.comp;
+set orion2.sales;
+if Country='US' then Bonus=100;
+else Bonus=300;
+run;
+-----------------------------------------------------------------------
+UPCASE: to check if country is lower case as well as upper case
+
+data work.bonus;
+set orion1.nonsales;
+if upcase(Country)='US'
+then Bonus=100;
+else Bonus=300;
+run; 
+-----------------------------------------------------------------------
+DO: for changing various variable together in if then else statement
+
+data work.bonus;
+set orion1.nonsales;
+if upcase(Country)='US'
+then do;
+BONUS=500;
+Freq='Once a Year';
+end;
+else if Country='AU' then do;
+Bonus=300;
+Freq='Twice a Year';
+end;
+run; 
+
+The above program will print:
+Twice a Yea
+in freq column
+So, to increase the length use:
+length freq $ 12;
+-----------------------------------------------------------------------
+Concate data set:
+
+WITH SAME COLUMN NAME:
+data work empsdk;
+	input First :$12. Gender :$1. Country :$12.;
+	datalines;
+	Lars M Denmark
+	Kari F Denmark
+	Jonas M Denmark
+	;
+data work empsfr;
+	input FIrst :$12. Gender :$1. Country :$12.;
+	datalines;
+	Pierre M France
+	Sophie F France
+	;
+data empsal;
+	set empsdk empsfr;
+run;
+
+WITH DIFFERENT COLUMNS:
+data work empscn;
+	input First :$12. Gender :$1. Country :$12.;
+	datalines;
+	Chang M China
+	Li M China
+	Ming F China
+	;
+data work empsjp;
+	input First :$12. Gender :$1. Region :$12.;
+	datalines;
+	Cho F Japan
+	Tomi M Japan
+	;
+data empsal112;
+	set empscn empsjp;
+run;
+
+OUTPUT:
+	First	Gender	Country	Region
+	Chang	M	China	
+	Li	M	China	
+	Ming	F	China	
+	Cho	F		Japan
+	Tomi	M		Japan
+
+TO CHANGE DIFFERENT COLUMNS TO SAM COLUMN USE RENAME:
+data empsal112;
+	set empscn empsjp(rename=(Region=Country));
+run;
+
+OUTPUT:
+	First	Gender	Country
+	Chang	M	China
+	Li	M	China
+	Ming	F	China
+	Cho	F	Japan
+	Tomi	M	Japan
+
+-----------------------------------------------------------------------
+MERGE DATASET USING ONE-TO-ONE MERGE:
+
+data work empsau;
+	input First :$12. Gender :$1. EmpId :10.;
+	datalines;
+	Togar M 121150
+	Kylie M 121151
+	Birin F 121152
+	;
+data work phoneh;
+	input EmpId :10. Phone :$20.;
+	datalines;
+	121150 +61(2)5555-1793
+	121151 +61(2)5555-1849
+	121152 +61(2)5555-1665
+	;
+data Employee;
+	merge empsau phoneh ;	
+run;
+proc print data=Employee noobs;
+run;
+
+OUTPUT:
+	First	Gender EmpId	Phone
+	Togar	M	121150	+61(2)5555-1793
+	Kylie	M	121151	+61(2)5555-1849
+	Birin	F	121152	+61(2)5555-1665
+
+-----------------------------------------------------------------------
+FREQUENCY OF VARIABLES:
+proc freq data=orion2.sales;
+	tables Gender;
+	where Country='AU';
+run;
+
+No cumulative frequency and No cumulative percentage:
+proc freq data=orion2.sales;
+	tables Country / nocum nopercent;
+run;
+
+To Tabulate different variables in one code:
+proc freq data=orion2.sales;
+	tables Country Gender;
+run;
+
+To show row and column:
+proc freq data=sorted;
+	tables Gender*Country;
+run;
+SEE IMAGE 4
+
+To see missing values frequency:
+proc freq data=orion1.nonsales;
+	tables Gender Country / nocum nopercent ;
+run;
+
+To see distinct variables available:
+proc freq data=orion1.nonsales nlevels;
+	tables Gender Country / nocum nopercent ;
+run;
+
+To display result in descending frequency order:
+proc freq data=orion1.nonsales order=freq;
+	tables Gender Country / nocum nopercent ;
+run;
+
+Dislay number of levels for all variable without frequency count:
+proc freq data=orion1.nonsales nlevels;
+	tables _all_ / noprint ;
+run;
+
+-----------------------------------------------------------------------
+
+BY STATEMENT:
+proc sort data=Orion2.sales out=sorted;
+	by Country;
+run;
+proc freq data=sorted;
+	tables Gender;
+	by Country;
+run;
+
+SEE IMAGE 3
+------------------------------------------------------------------
+MEANS PROCEDURE
+proc means data=orion2.sales;
+run;
+
+shows N, Mean, Std. Deviation, Minimum, Maximum
+
+CLASSIFY SALARY ACCORDING TO GENDER AND COUNTRY:
+proc means data=orion2.sales;
+	var salary;
+	class Gender Country;
+run;
+
+IN N Obs missing value will be counted , in N will not be counted.
+N Miss shows number of missing value.
+-----------------------------------------------------------------------UNIVARiATE
+proc univariate data=orion1.nonsales2 ;
+	var salary;
+run;
+----------------------------------------------------------------------
+CREATE REPEORT IN HTML,PDF & RTF FORMAT:
+
+ods html file="C:\SASData\Prg2\myreprt.html";
+proc freq data=orion2.sales;
+	tables Country ;
+run;
+ods html close;
+-----------------------------------------------------------------------
+CREATE MULTIPLE DATASET FROM ONE:
+data usa australia others;
+	set orion2.employee_addresses;
+	if Country='AU' then output australia;
+	else if Country='US' then output usa;
+	else output others;
+run;
+
+data usa australia others;
+	set orion2.employee_addresses;
+	select (Country);
+		when('AU') output australia;
+		when('US') output usa;
+		otherwise output others;
+	end;
+run;
+
+
+
